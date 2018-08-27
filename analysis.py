@@ -43,7 +43,7 @@ with open("Run331.txt","r") as csvfile:
         allhits['xmean'] = (allhits.xleft+allhits.xright)/2
 
         # add global coordinates
-        layer_conditions = [allhits.layer==1, allhits.layer==2, allhits.layer==3, allhits.layer==4]
+        layer_conditions = [allhits.layer==4, allhits.layer==3, allhits.layer==2, allhits.layer==1]
         chamber_conditions = [allhits.chamber==0, allhits.chamber==1, allhits.chamber==2, allhits.chamber==3]
         allhits['globalz'] = np.select(layer_conditions, local_z_shifts, default=0) + np.select(chamber_conditions, global_z_shifts, default=0)
         allhits['globalxleft'] = -allhits['xleft'] + np.select(chamber_conditions, global_x_shifts, default=0)
