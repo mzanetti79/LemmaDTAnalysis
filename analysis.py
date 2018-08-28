@@ -5,31 +5,43 @@ import pandas as pd
 from configuration import *
 from visualization import event_display
 from reconstruction import reconstruct
+from plots import plotter
 
 import argparse
 parser = argparse.ArgumentParser(description='analyze DT data')
 parser.add_argument('-i', '--input',  help='The unpacked input file to analyze')
 parser.add_argument("-v", "--verbose", default=False, action="store_true", help="increase output verbosity")
 parser.add_argument("-e", "--visualize", default=False, action="store_true", help="show event display")
+parser.add_argument("-c", "--calibration", default=False, action="store_true", help="show event display")
 args = parser.parse_args()
 
-
 # the base selections
-def skip_event(selectedhits):
+def skip_event(selectedhits, calibration):
     skip = False
-    # at least 3 chambers with hits
-    if 3 not in selectedhits.chamber.unique() or len(selectedhits.chamber.unique())<3: skip=True
-    # at least 2 hits in 2 different layers; not more than 10 hits per chamber
-    for chamber in selectedhits.chamber.unique():
+    chambers = selectedhits.chamber.unique()
+    if calibration:
+        if (not all(x in chambers for x in [0, 1])) and (not all(x in chambers for x in [2, 3])): skip=True
+    else:
+        if 3 not in chambers or len(chambers)<3: skip=True
+    for chamber in chambers:
         if len(selectedhits[selectedhits.chamber==chamber].layer.unique()) < 3: skip=True
         if len(selectedhits[selectedhits.chamber==chamber].chamber.tolist()) > 7: skip=True
     return skip
 
 
+# Analyze the input file
+with open(args.input,"r") as csvfile:
+    # the plotter
+    plotter = plotter()
 
-with open("Run331.txt","r") as csvfile:
+    # read the preporcessed csv file
     reader=csv.reader(csvfile, delimiter=' ', quoting=csv.QUOTE_NONNUMERIC)
+    counter=0
     for event in reader:
+        counter+=1
+
+        if counter%100==0: print (counter, "lines processed")
+        
         eventID=event[0]
         nhits=event[1]
 
@@ -57,7 +69,7 @@ with open("Run331.txt","r") as csvfile:
         selectedhits = pd.concat(list(selectedhits_tmp.values()))
 
         # select only candidate events
-        if skip_event(selectedhits): continue
+        if skip_event(selectedhits, args.calibration): continue
 
         if args.verbose:
             print ("----")
@@ -66,12 +78,14 @@ with open("Run331.txt","r") as csvfile:
             
         # reconstruct segments in each chamber
         segments = reconstruct(selectedhits, args.verbose)
-            
+        # fill plots
+        plotter.update(segments)
         # visualize events    
         if args.visualize: event_display(eventID, allhits,selectedhits, segments)
 
-            
-            
-
+    # stats
+    plotter.printout()
+    # plotting
+    plotter.plot()
 
         
