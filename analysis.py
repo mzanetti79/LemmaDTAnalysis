@@ -24,7 +24,7 @@ def skip_event(selectedhits, calibration):
     else:
         if 3 not in chambers or len(chambers)<3: skip=True
     for chamber in chambers:
-        if len(selectedhits[selectedhits.chamber==chamber].layer.unique()) < 3: skip=True
+        if len(selectedhits[selectedhits.chamber==chamber].layer.unique()) < 4: skip=True
         if len(selectedhits[selectedhits.chamber==chamber].chamber.tolist()) > 7: skip=True
     return skip
 
@@ -83,6 +83,8 @@ with open(args.input,"r") as csvfile:
         # visualize events    
         if args.visualize: event_display(eventID, allhits,selectedhits, segments)
 
+    # fit
+    plotter.fit()
     # stats
     plotter.printout()
     # plotting
