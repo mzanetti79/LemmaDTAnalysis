@@ -3,12 +3,13 @@
 features = ["chamber","layer","xleft","xright","timens"]
 
 # global ranges for the signal hits
-#ranges = {0:[540.,720.],1:[540.,720],2:[0.,200.],3:[0.,200.]}
-ranges = {0:[0.,720.],1:[0.,720],2:[0.,720.],3:[0.,720.]}
+ranges = {0:[540.,720.],1:[540.,720],2:[0.,200.],3:[0.,200.]}
+#ranges = {0:[0.,720.],1:[0.,720],2:[0.,720.],3:[0.,720.]}
 
 # chamber basic dimensions
 XCELL = 42.
 ZCELL = 13.
+VDRIFT = 0.05385
 
 # global X translations
 #X0 = 960
@@ -17,7 +18,7 @@ ZCELL = 13.
 #global_x_shifts = [X0+chamber0_extra_x_offset, X0, X0+chamber_x_offset, X0+chamber_x_offset]
 
 
-X0 = 950.1 # from geometry: arbitrary in DT system, roughly corresponding to beam position 
+X0 = 950.1-24.2 # from geometry: arbitrary in DT system, roughly corresponding to beam position 
 led_position_wrt_first_wire = 0 # arbitrary in DT system, to be assigned in order to move to global coordinates
 X0+=led_position_wrt_first_wire
 

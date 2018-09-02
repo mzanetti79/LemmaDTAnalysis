@@ -7,6 +7,8 @@ def fit(x, combinatorial):
     min_chi2=999999.
     for y in combinatorial:
         segment, residuals, _, _, _ = np.polyfit(x, y, 1, full=True)
+        # only segments with a reasonable slope are considered 
+        #if abs(np.poly1d(segment).c[0])>0.2: continue
         chi2 = residuals/(len(x)-2)
         if  chi2 < min_chi2:
             min_chi2 = chi2
@@ -27,7 +29,6 @@ def reconstruct(selectedhits, verbose=False):
                               chamberhits[chamberhits.layer==3].globalxleft.tolist() + chamberhits[chamberhits.layer==3].globalxright.tolist(),
                               chamberhits[chamberhits.layer==4].globalxleft.tolist() + chamberhits[chamberhits.layer==4].globalxright.tolist()
                               ])
-
 
         # the case with hits in 4 layers
         if len(chamberhits.globalz.unique())==4:

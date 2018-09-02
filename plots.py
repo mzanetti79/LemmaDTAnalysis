@@ -30,26 +30,16 @@ class plotter():
         except: pass
 
 
-    def fit(self):
-        self.mean = {}
-        self.std = {}
-        self.mean['deltaPhi'],self.std['deltaPhi']=norm.fit(self.deltaPhi['12'])
-        self.mean['deltaX1'],self.std['deltaX1']=norm.fit(self.deltaX['12at1'])
-        self.mean['deltaX2'],self.std['deltaX2']=norm.fit(self.deltaX['12at2'])
-        #self.mean['deltaPhi'],self.std['deltaPhi']=norm.fit(self.deltaPhi['34'])
-        #self.mean['deltaX1'],self.std['deltaX1']=norm.fit(self.deltaX['34at3'])
-        #self.mean['deltaX2'],self.std['deltaX2']=norm.fit(self.deltaX['34at4'])
-            
+
     def plot(self):
-        figures = {"deltaX": plt.figure(num=1,figsize=(8,8)), "deltaPhi":plt.figure(num=2,figsize=(8,8))}
+        figures = {"deltaX": plt.figure(num=1,figsize=(10,8)), "deltaPhi":plt.figure(num=2,figsize=(10,8))}
         axes = {"deltaX":[],"deltaPhi":[]}
-        gaus_x = {}
-        gaus_y = {"deltaX":[]}
         
         # Delta X
-        gaus_x["deltaX"] = np.linspace(-100, 100, 1000)
-        axes["deltaX"].append(figures["deltaX"].add_subplot(2,1,1))
-        axes["deltaX"].append(figures["deltaX"].add_subplot(2,1,2))
+        axes["deltaX"].append(figures["deltaX"].add_subplot(2,2,1))
+        axes["deltaX"].append(figures["deltaX"].add_subplot(2,2,2))
+        axes["deltaX"].append(figures["deltaX"].add_subplot(2,2,3))
+        axes["deltaX"].append(figures["deltaX"].add_subplot(2,2,4))
         for ax in axes["deltaX"]:
             ax.set_ylabel("entries")
             ax.set_xlabel("deltaX [mm]")
@@ -58,34 +48,32 @@ class plotter():
         axes["deltaX"][0].hist(self.deltaX['12at1'], 200, normed=True)
         axes["deltaX"][1].set_title("At Chamber 2")
         axes["deltaX"][1].hist(self.deltaX['12at2'], 200, normed=True)
-        #axes["deltaX"][0].set_title("At Chamber 3")
-        #axes["deltaX"][0].hist(self.deltaX['34at3'], 100, normed=True)
-        #axes["deltaX"][1].set_title("At Chamber 4")
-        #axes["deltaX"][1].hist(self.deltaX['34at4'], 100, normed=True)
-        gaus_y["deltaX"].append(norm.pdf(gaus_x["deltaX"], self.mean["deltaX1"], self.std["deltaX1"]))
-        axes["deltaX"][0].plot(gaus_x["deltaX"],gaus_y["deltaX"][0])
-        gaus_y["deltaX"].append(norm.pdf(gaus_x["deltaX"], self.mean["deltaX2"], self.std["deltaX2"]))
-        axes["deltaX"][1].plot(gaus_x["deltaX"],gaus_y["deltaX"][1])
-        plt.tight_layout()
+        axes["deltaX"][2].set_title("At Chamber 3")
+        axes["deltaX"][2].hist(self.deltaX['34at3'], 100, normed=True)
+        axes["deltaX"][3].set_title("At Chamber 4")
+        axes["deltaX"][3].hist(self.deltaX['34at4'], 100, normed=True)
         
         # Phi and Delta Phi
-        axes["deltaPhi"].append(figures["deltaPhi"].add_subplot(2,1,1))
+        axes["deltaPhi"].append(figures["deltaPhi"].add_subplot(2,2,1))
         axes["deltaPhi"][0].set_ylabel("phi 1 [rad]")
         axes["deltaPhi"][0].set_xlabel("phi 2 [rad]")
         axes["deltaPhi"][0].scatter(self.phi['1'],self.phi['2'])
-        #axes["deltaPhi"][0].scatter(self.phi['3'],self.phi['4'])
-
-        
-        axes["deltaPhi"].append(figures["deltaPhi"].add_subplot(2,1,2))
+        axes["deltaPhi"].append(figures["deltaPhi"].add_subplot(2,2,2))
         axes["deltaPhi"][1].set_ylabel("entries")
         axes["deltaPhi"][1].set_xlabel("delta phi")
         axes["deltaPhi"][1].set_xlim(-0.2, 0.2)
         axes["deltaPhi"][1].hist(self.deltaPhi['12'], 200, normed=True)
-        #axes["deltaPhi"][1].hist(self.deltaPhi['34'], 200, normed=True)
-        gaus_x["deltaPhi"] = np.linspace(-0.2, 0.2, 100)
-        gaus_y["deltaPhi"] = norm.pdf(gaus_x["deltaPhi"], self.mean["deltaPhi"], self.std["deltaX2"])
-        axes["deltaPhi"][1].plot(gaus_x["deltaPhi"],gaus_y["deltaPhi"])
         
+        axes["deltaPhi"].append(figures["deltaPhi"].add_subplot(2,2,3))
+        axes["deltaPhi"][2].set_ylabel("phi 3 [rad]")
+        axes["deltaPhi"][2].set_xlabel("phi 4 [rad]")
+        axes["deltaPhi"][2].scatter(self.phi['3'],self.phi['4'])
+        axes["deltaPhi"].append(figures["deltaPhi"].add_subplot(2,2,4))
+        axes["deltaPhi"][3].set_ylabel("entries")
+        axes["deltaPhi"][3].set_xlabel("delta phi")
+        axes["deltaPhi"][3].set_xlim(-0.2, 0.2)
+        axes["deltaPhi"][3].hist(self.deltaPhi['34'], 200, normed=True)
+
         plt.tight_layout()
         plt.show()
 
@@ -100,5 +88,6 @@ class plotter():
         for i in range(1,5): print ("Phi",i,": mean = ",self.phi[str(i)].mean()," RMS = ", self.phi[str(i)].std())
         print ("Delta Phi Ch1-Ch2: mean =", self.deltaPhi['12'].mean(), " RMS = ", self.deltaPhi['12'].std())
         print ("Delta Phi Ch3-Ch4: mean =", self.deltaPhi['34'].mean(), " RMS = ", self.deltaPhi['34'].std())
-        print ("--- F I T    S U M M A R Y ---")
-        for m in self.mean: print (m,"mean:", self.mean[m], "std:", self.std[m])
+
+        np.save("output/distributions.npy", {"deltaX":self.deltaX,"deltaPhi":self.deltaPhi,"phi":self.phi})
+            

@@ -55,6 +55,8 @@ print ("jura 4-3:", out)
 
 print("tilts")
 tilts=[(z[l.index("c"+i+"s")]-z[l.index("c"+i+"j")])/(x[l.index("c"+i+"s")]-x[l.index("c"+i+"j")]) for i in ["1","2","3","4"]]
+print ("tilts")
+for i in tilts: print(i*180/np.pi)
 print ("tilts:", tilts)
 out=tilts[1]-tilts[0]
 print ("deltaphi 2-1:", out)
