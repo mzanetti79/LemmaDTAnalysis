@@ -12,12 +12,13 @@ def fit(x, combinatorial):
         chi2 = residuals/(len(x)-2)
         if  chi2 < min_chi2:
             min_chi2 = chi2
-            best_segment = np.poly1d(segment) 
-    return best_segment
+            best_segment = np.poly1d(segment)
+            best_combination = y
+    return best_segment, {"x": x, "y":best_combination}
     
 
-def reconstruct(selectedhits, verbose=False):
-    result = {}
+def segment_reconstructor(selectedhits, verbose=False):
+    segments, best_hits = {}, {}
     for chamber in selectedhits.chamber.unique():
 
         # get the hits in the chamber
@@ -54,10 +55,33 @@ def reconstruct(selectedhits, verbose=False):
             print ("reconstructing chamber",chamber)
             print ("resolving the following",len(combinatorial),"combinations")
             print (combinatorial)
+
+        # resolve combinatorial and reconstruct the best segments
+        segments[chamber], best_hits[chamber] = fit(x, combinatorial)
+        if verbose: print ("best fit:", segments[chamber], best_hits)
             
-        result[chamber] = fit(x, combinatorial)
-        if verbose:
-            print ("best fit:", result[chamber])
-            
-    return result
+    return segments, best_hits
                     
+def track_reconstructor(hits, verbose=False):
+
+    tracks = {}
+
+    # negative side
+    if all(x in hits.keys() for x in [2, 3]):
+        negative_leg_hits_x = np.append(hits[2]["x"],hits[3]["x"])
+        negative_leg_hits_y = np.append(hits[2]["y"],hits[3]["y"])
+        track, residuals, _, _, _ = np.polyfit(negative_leg_hits_x, negative_leg_hits_y, 1, full=True)
+        tracks["neg"] = np.poly1d(track)
+        if verbose: print (tracks["neg"])
+
+
+    # positive side
+    if all(x in hits.keys() for x in [0, 1]):
+        positive_leg_hits_x = np.append(hits[0]["x"],hits[1]["x"])
+        positive_leg_hits_y = np.append(hits[0]["y"],hits[1]["y"])
+        track, residuals, _, _, _ = np.polyfit(positive_leg_hits_x, positive_leg_hits_y, 1, full=True)
+        tracks["pos"] = np.poly1d(track)
+        if verbose: print (tracks["pos"])
+
+        
+    return tracks

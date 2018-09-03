@@ -10,8 +10,10 @@ class plotter():
         self.deltaX = {'12at1':np.array([]),'12at2':np.array([]),'34at3':np.array([]),'34at4':np.array([])}
         self.phi = {'1':np.array([]),'2':np.array([]),'3':np.array([]),'4':np.array([])}
         self.deltaPhi = {'12':np.array([]),'34':np.array([])}
-
-    def update(self, segments):
+        self.trackPhi = {'neg':np.array([]),'pos':np.array([])}
+        self.trackX = {'neg':np.array([]),'pos':np.array([])}
+        
+    def update(self, segments, tracks):
         try:
             if abs(segments[0].c[0])<0.2 and abs(segments[1].c[0])<0.2:
                 self.deltaX['12at1']=np.append(self.deltaX['12at1'],segments[0](global_z_shifts[0]) - segments[1](global_z_shifts[0]))
@@ -19,6 +21,8 @@ class plotter():
                 self.phi['1']=np.append(self.phi['1'],segments[0].c[0])
                 self.phi['2']=np.append(self.phi['2'],segments[1].c[0])
                 self.deltaPhi['12']=np.append(self.deltaPhi['12'],segments[0].c[0]-segments[1].c[0])
+                self.trackPhi['pos']=np.append(self.trackPhi['pos'], tracks['pos'].c[0])
+                self.trackX['pos']=np.append(self.trackX['pos'], tracks['pos'](global_z_shifts[0]))
         except: pass
         try:
             if abs(segments[2].c[0])<0.2 and abs(segments[3].c[0])<0.2:
@@ -27,6 +31,8 @@ class plotter():
                 self.phi['3']=np.append(self.phi['3'],segments[2].c[0])
                 self.phi['4']=np.append(self.phi['4'],segments[3].c[0])
                 self.deltaPhi['34']=np.append(self.deltaPhi['34'],segments[2].c[0]-segments[3].c[0])
+                self.trackPhi['neg']=np.append(self.trackPhi['neg'], tracks['neg'].c[0])
+                self.trackX['neg']=np.append(self.trackX['neg'], tracks['neg'](global_z_shifts[0]))
         except: pass
 
 
@@ -89,5 +95,5 @@ class plotter():
         print ("Delta Phi Ch1-Ch2: mean =", self.deltaPhi['12'].mean(), " RMS = ", self.deltaPhi['12'].std())
         print ("Delta Phi Ch3-Ch4: mean =", self.deltaPhi['34'].mean(), " RMS = ", self.deltaPhi['34'].std())
 
-        np.save("output/distributions.npy", {"deltaX":self.deltaX,"deltaPhi":self.deltaPhi,"phi":self.phi})
+        np.save("output/distributions.npy", {"deltaX":self.deltaX,"deltaPhi":self.deltaPhi,"phi":self.phi, "trackPhi": self.trackPhi, "trackX": self.trackX})
             

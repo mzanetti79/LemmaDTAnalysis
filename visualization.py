@@ -4,7 +4,7 @@ import numpy as np
 
 from configuration import *
 
-def event_display(eventID, allhits, selectedhits, segments):
+def event_display(eventID, allhits, selectedhits, segments, tracks):
 
     fig, ax = plt.subplots(figsize=(10,7))
     # set figure propreties
@@ -28,8 +28,11 @@ def event_display(eventID, allhits, selectedhits, segments):
 
     # draw segments
     yi = np.linspace(-20, 900, 1000)
-    for chamber in segments: ax.plot(segments[chamber](yi), yi,"k-")
+    for chamber in segments: ax.plot(segments[chamber](yi), yi, "c", linestyle='--')
 
+    # draw tracks
+    for leg in tracks: ax.plot(tracks[leg](yi), yi,"k-")
+    
     plt.xlabel("x [mm]")
     plt.ylabel("z [mm]")        
     plt.title("Event "+str(int(eventID)))

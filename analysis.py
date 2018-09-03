@@ -4,7 +4,7 @@ import pandas as pd
 
 from configuration import *
 from visualization import event_display
-from reconstruction import reconstruct
+from reconstruction import segment_reconstructor, track_reconstructor
 from plots import plotter
 from calibration import calibrator
 
@@ -85,11 +85,12 @@ with open(args.input,"r") as csvfile:
             print (selectedhits)
             
         # reconstruct segments in each chamber
-        segments = reconstruct(selectedhits, args.verbose)
+        segments, besthits = segment_reconstructor(selectedhits, args.verbose)
+        tracks = track_reconstructor(besthits)
         # fill plots
-        plotter.update(segments)
+        plotter.update(segments, tracks)
         # visualize events    
-        if args.visualize: event_display(eventID, allhits,selectedhits, segments)
+        if args.visualize: event_display(eventID, allhits,selectedhits, segments, tracks)
         # fil timeboxes
         if args.timeboxes: calibrator.update(selectedhits)
 

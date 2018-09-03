@@ -33,6 +33,14 @@ global_x_shifts = [
     X0+x_offset_between_front_chambers, # chamber 4, the reference on the left
     ]
 
+# nicola's
+global_x_shifts = [
+    994.2,
+    947.4,
+    -267.4,
+    -261.5,
+    ]
+
 # global Z translations
 chamber_z_offset = 770. + ZCELL*4 +1.5
 global_z_shifts = [chamber_z_offset, 0, chamber_z_offset,0]
