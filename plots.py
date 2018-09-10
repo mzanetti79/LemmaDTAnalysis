@@ -7,34 +7,53 @@ from configuration import *
 
 class plotter():
     def __init__(self):
-        self.deltaX = {'12at1':np.array([]),'12at2':np.array([]),'34at3':np.array([]),'34at4':np.array([])}
+        self.X = {'1':np.array([]),'2':np.array([]),'3':np.array([]),'4':np.array([])}
         self.phi = {'1':np.array([]),'2':np.array([]),'3':np.array([]),'4':np.array([])}
+        self.Xc = {'1':np.array([]),'2':np.array([]),'3':np.array([]),'4':np.array([])}
+        self.phic = {'1':np.array([]),'2':np.array([]),'3':np.array([]),'4':np.array([])}
+        self.deltaX = {'12at1':np.array([]),'12at2':np.array([]),'34at3':np.array([]),'34at4':np.array([])}
         self.deltaPhi = {'12':np.array([]),'34':np.array([])}
         self.trackPhi = {'neg':np.array([]),'pos':np.array([])}
         self.trackX = {'neg':np.array([]),'pos':np.array([])}
-        
+        self.eventTracksPhi = {'neg':np.array([]),'pos':np.array([])}
+        self.eventTracksX = {'neg':np.array([]),'pos':np.array([])}
+                
     def update(self, segments, tracks):
-        try:
+
+        for i in segments.keys():
+            if abs(segments[i].c[0])<0.2:
+                self.X[str(int(i+1))]=np.append(self.X[str(int(i+1))],segments[i](global_z_shifts[int(i%2)]))
+                self.phi[str(int(i+1))]=np.append(self.phi[str(int(i+1))],segments[i].c[0])
+
+        if all(x in segments for x in [0, 1]):
             if abs(segments[0].c[0])<0.2 and abs(segments[1].c[0])<0.2:
                 self.deltaX['12at1']=np.append(self.deltaX['12at1'],segments[0](global_z_shifts[0]) - segments[1](global_z_shifts[0]))
                 self.deltaX['12at2']=np.append(self.deltaX['12at2'],segments[0](global_z_shifts[1]) - segments[1](global_z_shifts[1]))
-                self.phi['1']=np.append(self.phi['1'],segments[0].c[0])
-                self.phi['2']=np.append(self.phi['2'],segments[1].c[0])
                 self.deltaPhi['12']=np.append(self.deltaPhi['12'],segments[0].c[0]-segments[1].c[0])
-                self.trackPhi['pos']=np.append(self.trackPhi['pos'], tracks['pos'].c[0])
-                self.trackX['pos']=np.append(self.trackX['pos'], tracks['pos'](global_z_shifts[0]))
-        except: pass
-        try:
+                self.phic['1']=np.append(self.phic['1'],segments[0].c[0])
+                self.phic['2']=np.append(self.phic['2'],segments[1].c[0])
+                self.Xc['1']=np.append(self.Xc['1'],segments[0](global_z_shifts[0]))
+                self.Xc['2']=np.append(self.Xc['2'],segments[1](global_z_shifts[1]))
+                                
+        if all(x in segments for x in [2, 3]):
             if abs(segments[2].c[0])<0.2 and abs(segments[3].c[0])<0.2:
                 self.deltaX['34at3']=np.append(self.deltaX['34at3'],segments[2](global_z_shifts[0]) - segments[3](global_z_shifts[0]))
                 self.deltaX['34at4']=np.append(self.deltaX['34at4'],segments[2](global_z_shifts[1]) - segments[3](global_z_shifts[1]))
-                self.phi['3']=np.append(self.phi['3'],segments[2].c[0])
-                self.phi['4']=np.append(self.phi['4'],segments[3].c[0])
                 self.deltaPhi['34']=np.append(self.deltaPhi['34'],segments[2].c[0]-segments[3].c[0])
-                self.trackPhi['neg']=np.append(self.trackPhi['neg'], tracks['neg'].c[0])
-                self.trackX['neg']=np.append(self.trackX['neg'], tracks['neg'](global_z_shifts[0]))
-        except: pass
+                self.phic['3']=np.append(self.phic['3'],segments[2].c[0])
+                self.phic['4']=np.append(self.phic['4'],segments[3].c[0])
+                self.Xc['3']=np.append(self.Xc['3'],segments[2](global_z_shifts[0]))
+                self.Xc['4']=np.append(self.Xc['4'],segments[3](global_z_shifts[1]))
 
+        for leg in tracks.keys():
+            self.trackPhi[leg]=np.append(self.trackPhi[leg], tracks[leg].c[0])
+            self.trackX[leg]=np.append(self.trackX[leg], tracks[leg](global_z_shifts[0]))
+
+        if all(leg in tracks for leg in ['neg', 'pos']):
+            self.eventTracksPhi['pos']=np.append(self.eventTracksPhi['pos'], tracks['pos'].c[0])
+            self.eventTracksX['pos']=np.append(self.eventTracksX['pos'], tracks['pos'](global_z_shifts[0]))
+            self.eventTracksPhi['neg']=np.append(self.eventTracksPhi['neg'], tracks['neg'].c[0])
+            self.eventTracksX['neg']=np.append(self.eventTracksX['neg'], tracks['neg'](global_z_shifts[0]))
 
 
     def plot(self):
@@ -95,5 +114,17 @@ class plotter():
         print ("Delta Phi Ch1-Ch2: mean =", self.deltaPhi['12'].mean(), " RMS = ", self.deltaPhi['12'].std())
         print ("Delta Phi Ch3-Ch4: mean =", self.deltaPhi['34'].mean(), " RMS = ", self.deltaPhi['34'].std())
 
-        np.save("output/distributions.npy", {"deltaX":self.deltaX,"deltaPhi":self.deltaPhi,"phi":self.phi, "trackPhi": self.trackPhi, "trackX": self.trackX})
+        np.save("output/distributions.npy",
+                    {
+                    "X": self.X,
+                    "phi":self.phi,
+                    "Xc": self.Xc,
+                    "phic":self.phic,
+                    "deltaX":self.deltaX,
+                    "deltaPhi":self.deltaPhi,
+                    "trackPhi": self.trackPhi,
+                    "trackX": self.trackX,
+                    "eventTracksPhi": self.eventTracksPhi,
+                    "eventTracksX": self.eventTracksX,
+                    })
             
