@@ -10,9 +10,14 @@ XCELL = 42.
 ZCELL = 13.
 VDRIFT = 0.05385
 #TTRIGCORR = {"signal":10,"calibration":2}
-TTRIGCORR = {"signal":0,"calibration":0}
+TTRIGCORR = {"signal":0,"calibration":10}
 # global X shifts
-global_x_shifts = [994.2, 947.4,-267.4,-261.5,]
+# August Run
+#global_x_shifts = [994.2, 947.4,-267.4,-261.5,]
+# Nominal September Run
+#global_x_shifts = [994.2, 954.2,-220.8,-180.8,]
+# September Run
+global_x_shifts = [1045.7, 990.3, -247, -219.5] 
 
 # global Z translations
 chamber_z_offset = 770. + ZCELL*4 +1.5

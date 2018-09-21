@@ -72,10 +72,11 @@ with open(args.input,"r") as csvfile:
         allhits['globalz'] = np.select(layer_conditions, local_z_shifts, default=0) + np.select(chamber_conditions, global_z_shifts, default=0)
 
         correction = VDRIFT*TTRIGCORR["calibration"] if args.calibration else VDRIFT*TTRIGCORR["signal"] 
-        allhits['globalxleft']  = -(allhits['xleft']-correction) + np.select(chamber_conditions, global_x_shifts, default=0)
-        allhits['globalxright'] = -(allhits['xright']+correction) + np.select(chamber_conditions, global_x_shifts, default=0)
-        allhits['globalxmean']  = -allhits['xmean'] + np.select(chamber_conditions, global_x_shifts, default=0)
-
+        allhits['globalxleft']  = -(allhits['xleft']*1.03-correction) + np.select(chamber_conditions, global_x_shifts, default=0)
+        allhits['globalxright'] = -(allhits['xright']*1.03+correction) + np.select(chamber_conditions, global_x_shifts, default=0)
+        #allhits['globalxmean']  = -allhits['xmean'] + np.select(chamber_conditions, global_x_shifts, default=0)
+        allhits['globalxmean']  = (allhits.globalxleft+allhits.globalxright)/2
+        
         # select hits in range
         selectedhits_tmp = {}
         ranges = hit_ranges["calibration"] if args.calibration else hit_ranges["signal"]
