@@ -9,7 +9,8 @@ hit_ranges = {"signal":{0:[540.,720.],1:[540.,720],2:[0.,200.],3:[0.,200.]},
 XCELL = 42.
 ZCELL = 13.
 VDRIFT = 0.05385
-TTRIGCORR = {"signal":10,"calibration":2}
+#TTRIGCORR = {"signal":10,"calibration":2}
+TTRIGCORR = {"signal":0,"calibration":0}
 # global X shifts
 global_x_shifts = [994.2, 947.4,-267.4,-261.5,]
 
